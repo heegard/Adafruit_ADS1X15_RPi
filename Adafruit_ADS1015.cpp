@@ -66,19 +66,21 @@ static void i2cwrite(uint8_t x) {
 */
 /**************************************************************************/
 static void writeRegister(uint8_t i2cAddress, uint8_t reg, uint16_t value) {
-  wiringPiI2CWriteReg16(i2cFd, reg, value);
-//  wiringPiI2CWriteReg8(i2cFd, reg, (uint8_t)(value>>8));
-//  wiringPiI2CWriteReg8(i2cFd, reg, (uint8_t)(value & 0xFF));
+  wiringPiI2CWriteReg16(i2cFd, reg, (value>>8) | (value & 0xFF));
 
-//  wiringPiI2CWrite(i2cFd, reg);
-//  wiringPiI2CWrite(i2cFd, (uint8_t)(value>>8));
-//  wiringPiI2CWrite(i2cFd, (uint8_t)(value & 0xFF));
+  //wiringPiI2CWriteReg8(i2cFd, reg, (uint8_t)(value>>8));
+  //wiringPiI2CWriteReg8(i2cFd, reg, (uint8_t)(value & 0xFF));
+  
+  //wiringPiI2CWrite(i2cFd, reg);
+  //wiringPiI2CWrite(i2cFd, (uint8_t)(value>>8));
+  //wiringPiI2CWrite(i2cFd, (uint8_t)(value & 0xFF));
 
-//  Wire.beginTransmission(i2cAddress);
-//  i2cwrite((uint8_t)reg);
-//  i2cwrite((uint8_t)(value>>8));
-//  i2cwrite((uint8_t)(value & 0xFF));
-//  Wire.endTransmission();
+  // *** ORIGINAL ***
+  //Wire.beginTransmission(i2cAddress);
+  //i2cwrite((uint8_t)reg);
+  //i2cwrite((uint8_t)(value>>8));
+  //i2cwrite((uint8_t)(value & 0xFF));
+  //Wire.endTransmission();
 }
 
 /**************************************************************************/
@@ -87,16 +89,23 @@ static void writeRegister(uint8_t i2cAddress, uint8_t reg, uint16_t value) {
 */
 /**************************************************************************/
 static uint16_t readRegister(uint8_t i2cAddress, uint8_t reg) {
-//  return wiringPiI2CReadReg16(i2cFd, reg);
   wiringPiI2CWrite(i2cFd, ADS1015_REG_POINTER_CONVERT);
-  return wiringPiI2CReadReg16(i2cFd, reg);
+  uint16_t reading = wiringPiI2CReadReg16(i2cFd, reg);
+  reading = (reading>>8) | (reading<<8); // yes, wiringPi did not assemble the bytes as we want
+  return reading;
+
+  //return wiringPiI2CReadReg16(i2cFd, reg);
+
+  //return wiringPiI2CReadReg16(i2cFd, reg);
+
   //return ((i2cread() << 8) | i2cread());
 
-//  Wire.beginTransmission(i2cAddress);
-//  i2cwrite(ADS1015_REG_POINTER_CONVERT);
-//  Wire.endTransmission();
-//  Wire.requestFrom(i2cAddress, (uint8_t)2);
-//  return ((i2cread() << 8) | i2cread());  
+  // *** ORIGINAL ***
+  //Wire.beginTransmission(i2cAddress);
+  //i2cwrite(ADS1015_REG_POINTER_CONVERT);
+  //Wire.endTransmission();
+  //Wire.requestFrom(i2cAddress, (uint8_t)2);
+  //return ((i2cread() << 8) | i2cread());  
 }
 
 

@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
   uint16_t adc0;
 
-  ads.setGain(GAIN_TWO);
+  ads.setGain(GAIN_TWOTHIRDS);
   usleep(500000);
   ads.begin();
   usleep(500000);
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     //printBits(sizeof(adc0), &adc0);
     //printf(" *** %d\n", adc0);
     uint16_t adc0r = adc0;
-    //adc0r = (adc0r >> 8) | (adc0r << 8);
+    adc0r = (adc0r >> 8) | (adc0r << 8);
     printBits(sizeof(adc0r), &adc0r);
     printf(" ||| %d\n", adc0r);
     usleep(100000);
