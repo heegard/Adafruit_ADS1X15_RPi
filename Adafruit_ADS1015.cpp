@@ -18,15 +18,19 @@
     v1.0 - First release
 */
 /**************************************************************************/
-#if ARDUINO >= 100
- #include "Arduino.h"
-#else
- #include "WProgram.h"
-#endif
-
-#include <Wire.h>
+//#if ARDUINO >= 100
+// #include "Arduino.h"
+//#else
+// #include "WProgram.h"
+//#endif
+//
+//#include <Wire.h>
+#include <unistd.h>
+#include <wiringPiI2C.h>
 
 #include "Adafruit_ADS1015.h"
+
+int i2cFd;
 
 /**************************************************************************/
 /*!
@@ -34,11 +38,12 @@
 */
 /**************************************************************************/
 static uint8_t i2cread(void) {
-  #if ARDUINO >= 100
-  return Wire.read();
-  #else
-  return Wire.receive();
-  #endif
+  return wiringPiI2CRead(i2cFd);
+//  #if ARDUINO >= 100
+//  return Wire.read();
+//  #else
+//  return Wire.receive();
+//  #endif
 }
 
 /**************************************************************************/
@@ -47,11 +52,12 @@ static uint8_t i2cread(void) {
 */
 /**************************************************************************/
 static void i2cwrite(uint8_t x) {
-  #if ARDUINO >= 100
-  Wire.write((uint8_t)x);
-  #else
-  Wire.send(x);
-  #endif
+  wiringPiI2CWrite(i2cFd, x);
+//  #if ARDUINO >= 100
+//  Wire.write((uint8_t)x);
+//  #else
+//  Wire.send(x);
+//  #endif
 }
 
 /**************************************************************************/
@@ -60,29 +66,44 @@ static void i2cwrite(uint8_t x) {
 */
 /**************************************************************************/
 static void writeRegister(uint8_t i2cAddress, uint8_t reg, uint16_t value) {
-  Wire.beginTransmission(i2cAddress);
-  i2cwrite((uint8_t)reg);
-  i2cwrite((uint8_t)(value>>8));
-  i2cwrite((uint8_t)(value & 0xFF));
-  Wire.endTransmission();
+  wiringPiI2CWriteReg16(i2cFd, reg, value);
+//  wiringPiI2CWriteReg8(i2cFd, reg, (uint8_t)(value>>8));
+//  wiringPiI2CWriteReg8(i2cFd, reg, (uint8_t)(value & 0xFF));
+
+//  wiringPiI2CWrite(i2cFd, reg);
+//  wiringPiI2CWrite(i2cFd, (uint8_t)(value>>8));
+//  wiringPiI2CWrite(i2cFd, (uint8_t)(value & 0xFF));
+
+//  Wire.beginTransmission(i2cAddress);
+//  i2cwrite((uint8_t)reg);
+//  i2cwrite((uint8_t)(value>>8));
+//  i2cwrite((uint8_t)(value & 0xFF));
+//  Wire.endTransmission();
 }
 
 /**************************************************************************/
 /*!
-    @brief  Writes 16-bits to the specified destination register
+    @brief  Reads 16-bits from the specified destination register
 */
 /**************************************************************************/
 static uint16_t readRegister(uint8_t i2cAddress, uint8_t reg) {
-  Wire.beginTransmission(i2cAddress);
-  i2cwrite(ADS1015_REG_POINTER_CONVERT);
-  Wire.endTransmission();
-  Wire.requestFrom(i2cAddress, (uint8_t)2);
-  return ((i2cread() << 8) | i2cread());  
+//  return wiringPiI2CReadReg16(i2cFd, reg);
+  wiringPiI2CWrite(i2cFd, ADS1015_REG_POINTER_CONVERT);
+  return wiringPiI2CReadReg16(i2cFd, reg);
+  //return ((i2cread() << 8) | i2cread());
+
+//  Wire.beginTransmission(i2cAddress);
+//  i2cwrite(ADS1015_REG_POINTER_CONVERT);
+//  Wire.endTransmission();
+//  Wire.requestFrom(i2cAddress, (uint8_t)2);
+//  return ((i2cread() << 8) | i2cread());  
 }
+
+
 
 /**************************************************************************/
 /*!
-    @brief  Instantiates a new ADS1015 class w/appropriate properties
+   @brief  Instantiates a new ADS1015 class w/appropriate properties
 */
 /**************************************************************************/
 Adafruit_ADS1015::Adafruit_ADS1015(uint8_t i2cAddress) 
@@ -100,8 +121,8 @@ Adafruit_ADS1015::Adafruit_ADS1015(uint8_t i2cAddress)
 /**************************************************************************/
 Adafruit_ADS1115::Adafruit_ADS1115(uint8_t i2cAddress)
 {
-   m_i2cAddress = i2cAddress;
-   m_conversionDelay = ADS1115_CONVERSIONDELAY;
+   m_i2cAddress = i2cAddress; // 48
+   m_conversionDelay = ADS1115_CONVERSIONDELAY; // 8
    m_bitShift = 0;
    m_gain = GAIN_TWOTHIRDS; /* +/- 6.144V range (limited to VDD +0.3V max!) */
 }
@@ -112,7 +133,7 @@ Adafruit_ADS1115::Adafruit_ADS1115(uint8_t i2cAddress)
 */
 /**************************************************************************/
 void Adafruit_ADS1015::begin() {
-  Wire.begin();
+  i2cFd = wiringPiI2CSetup(m_i2cAddress);
 }
 
 /**************************************************************************/
@@ -181,7 +202,7 @@ uint16_t Adafruit_ADS1015::readADC_SingleEnded(uint8_t channel) {
   writeRegister(m_i2cAddress, ADS1015_REG_POINTER_CONFIG, config);
 
   // Wait for the conversion to complete
-  delay(m_conversionDelay);
+  usleep(1000*m_conversionDelay);
 
   // Read the conversion results
   // Shift 12-bit results right 4 bits for the ADS1015
@@ -218,7 +239,7 @@ int16_t Adafruit_ADS1015::readADC_Differential_0_1() {
   writeRegister(m_i2cAddress, ADS1015_REG_POINTER_CONFIG, config);
 
   // Wait for the conversion to complete
-  delay(m_conversionDelay);
+  usleep(1000*m_conversionDelay);
 
   // Read the conversion results
   uint16_t res = readRegister(m_i2cAddress, ADS1015_REG_POINTER_CONVERT) >> m_bitShift;
@@ -269,7 +290,7 @@ int16_t Adafruit_ADS1015::readADC_Differential_2_3() {
   writeRegister(m_i2cAddress, ADS1015_REG_POINTER_CONFIG, config);
 
   // Wait for the conversion to complete
-  delay(m_conversionDelay);
+  usleep(1000*m_conversionDelay);
 
   // Read the conversion results
   uint16_t res = readRegister(m_i2cAddress, ADS1015_REG_POINTER_CONVERT) >> m_bitShift;
@@ -348,7 +369,7 @@ void Adafruit_ADS1015::startComparator_SingleEnded(uint8_t channel, int16_t thre
 int16_t Adafruit_ADS1015::getLastConversionResults()
 {
   // Wait for the conversion to complete
-  delay(m_conversionDelay);
+  usleep(1000*m_conversionDelay);
 
   // Read the conversion results
   uint16_t res = readRegister(m_i2cAddress, ADS1015_REG_POINTER_CONVERT) >> m_bitShift;
