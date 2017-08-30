@@ -25,7 +25,11 @@
 //#endif
 
 //#include <Wire.h>
+
 #include <stdint.h>
+
+#include "/home/pi/Adafruit_ADS1X15_RPi/include/wiringPi/wiringPi.h"
+#include "/home/pi/Adafruit_ADS1X15_RPi/include/wiringPi/wiringPiI2C.h"
 
 /*=========================================================================
     I2C ADDRESS/BITS
