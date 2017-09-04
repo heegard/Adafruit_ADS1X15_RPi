@@ -26,6 +26,7 @@
 
 //#include <Wire.h>
 #include <stdint.h>
+#include <stdio.h>
 
 /*=========================================================================
     I2C ADDRESS/BITS
@@ -123,6 +124,7 @@ class Adafruit_ADS1015
 protected:
    // Instance-specific properties
    uint8_t   m_i2cAddress;
+   int       m_i2cFd;
    uint8_t   m_conversionDelay;
    uint8_t   m_bitShift;
    adsGain_t m_gain;
@@ -134,7 +136,9 @@ protected:
   int16_t   readADC_Differential_0_1(void);
   int16_t   readADC_Differential_2_3(void);
   void      startComparator_SingleEnded(uint8_t channel, int16_t threshold);
+  void      updateWiringPiSetup();
   int16_t   getLastConversionResults();
+  void      setI2cAddress(uint8_t i2cAddress);
   void      setGain(adsGain_t gain);
   adsGain_t getGain(void);
 
