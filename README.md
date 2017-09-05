@@ -1,3 +1,48 @@
+dafruit_ADS1X15_RPi
+
+Adafruit's ADS1X15 C++ library is compatible with various Arduinos. This fork modifies the library to be compatible with Raspberry Pi by using the wiringPi library to do the i2c communications instead of Arduino's wiring.h library. Note that there already exists an ADS1X15 Python library for RPi written by Adafruit: https://github.com/adafruit/Adafruit_Python_ADS1x15. In my case I needed to integrate the library with other C++ code so I made this fork.
+
+[Tested on Raspberry Pi Zero W running Raspbian Jessie]
+
+## Getting started
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+Install wiringPi:
+  http://wiringpi.com/download-and-install/
+
+Enable RPi's SPI and I2C interfaces:
+```
+sudo raspi-config
+# then go to "Interfacing Options"
+# and enable SPI and I2C
+```
+
+### Installing
+Clone this repository:
+```
+cd ~
+git clone https://github.com/hallgrimur1471/Adafruit_ADS1X15_RPi.git
+```
+Now compile, say, the differential_rpi.c example:
+```
+cd ~/Adafruit_ADS1X15_RPi
+g++ -W -lwiringPi -o differential_rpi examples/differential_rpi.c Adafruit_ADS1015.cpp
+```
+
+And run it:
+```
+./differential_rpi
+```
+
+The program should now output ADS1X15's measurements.
+
+Note that the differential_rpi.c example assumes you have the ADS1X15 circuit wired for differential measurements (see https://learn.adafruit.com/adafruit-4-channel-adc-breakouts/signal-connections).
+
+
+### Original README.md from fork's origin:
+
 Adafruit_ADS1015
 ================
 
