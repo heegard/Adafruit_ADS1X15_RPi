@@ -26,8 +26,9 @@
 //
 //#include <Wire.h>
 #include <unistd.h>
-#include <wiringPiI2C.h>
 
+#include "./include/wiringPi/wiringPi.h"
+#include "./include/wiringPi/wiringPiI2C.h"
 #include "Adafruit_ADS1015.h"
 
 int i2cFd;
