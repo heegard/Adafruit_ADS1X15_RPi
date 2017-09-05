@@ -1,4 +1,4 @@
-dafruit_ADS1X15_RPi
+# Adafruit_ADS1X15_RPi
 
 Adafruit's ADS1X15 C++ library is compatible with various Arduinos. This fork modifies the library to be compatible with Raspberry Pi by using the wiringPi library to do the i2c communications instead of Arduino's wiring.h library. Note that there already exists an ADS1X15 Python library for RPi written by Adafruit: https://github.com/adafruit/Adafruit_Python_ADS1x15. In my case I needed to integrate the library with other C++ code so I made this fork.
 
