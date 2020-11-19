@@ -64,7 +64,7 @@ static void i2cwrite(uint8_t i2cFd, uint8_t x) {
 */
 /**************************************************************************/
 static void writeRegister(uint8_t i2cFd, uint8_t i2cAddress, uint8_t reg, uint16_t value) {
-  wiringPiI2CWriteReg16(i2cFd, reg, (value>>8) | (value & 0xFF));
+  wiringPiI2CWriteReg16(i2cFd, reg, (value>>8) | (value<<8));
 
   //wiringPiI2CWriteReg8(m_i2cFd, reg, (uint8_t)(value>>8));
   //wiringPiI2CWriteReg8(m_i2cFd, reg, (uint8_t)(value & 0xFF));
